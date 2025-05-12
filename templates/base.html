@@ -1,0 +1,27 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Team Woff{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🐾 Team Woff</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <a href="/register">Register</a> |
+            <a href="/walkers">Walkers</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Team Woff. All rights reserved.</p>
+    </footer>
+</body>
+</html>

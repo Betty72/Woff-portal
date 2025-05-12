@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Registered Walkers{% endblock %}
+
+{% block content %}
+<h2>All Registered Dog Walkers</h2>
+
+{% if walkers %}
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Name</th>
+        <th>City</th>
+        <th>Experience</th>
+        <th>Availability</th>
+        <th>Dog Size</th>
+        <th>Photo</th>
+        {% if session.get('admin') %}
+            <th>Remove</th>
+        {% endif %}
+    </tr>
+
+    {% for walker in walkers %}
+    <td>{{ walker['name'] }}</td>
+    <td>{{ walker['city'] }}</td>
+    <td>{{ walker['experience'] }}</td>
+    <td>{{ walker['availability'] }}</td>
+    <td>{{ walker['dog_size'] }}</td>
+    <td>
+        {% if walker['photo'] %}
+            <img src="{{ url_for('static', filename='uploads/' + walker['photo']) }}" alt="Profile Picture" width="80">
+        {% else %}
+            No photo
+        {% endif %}
+    </td>
+    
+        {% if session.get('admin') %}
+        <td>
+            <form method="POST" action="{{ url_for('remove_walker') }}">
+                <input type="hidden" name="walker_id" value="{{ loop.index0 }}">
+                <button type="submit">Remove</button>
+            </form>
+        </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No dog walkers registered yet. 🐾</p>
+{% endif %}
+{% endblock %}
+
+

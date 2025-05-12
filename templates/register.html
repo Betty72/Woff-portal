@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Register Dog Walker{% endblock %}
+
+{% block content %}
+<h2>Dog Walker Registration</h2>
+<form method="POST" enctype="multipart/form-data">
+    <label>Name:</label><br>
+    <input type="text" name="name"><br><br>
+    
+    <label>City:</label><br>
+    <input type="text" name="city"><br><br>
+    
+    <label>Years of Experience:</label><br>
+    <input type="number" name="experience"><br><br>
+
+    <label>Availability:</label><br>
+    <input type="checkbox" name="availability" value="Morning"> Morning<br>
+    <input type="checkbox" name="availability" value="Afternoon"> Afternoon<br>
+    <input type="checkbox" name="availability" value="Evening"> Evening<br><br>
+
+    <label>Preferred Dog Size:</label><br>
+    <select name="dog_size">
+        <option value="Small">Small</option>
+        <option value="Medium">Medium</option>
+        <option value="Large">Large</option>
+    </select><br><br>
+
+    <label>Profile Picture:</label><br>
+    <input type="file" name="profile_pic"><br><br>
+
+    <input type="submit" value="Register">
+</form>
+{% endblock %}
