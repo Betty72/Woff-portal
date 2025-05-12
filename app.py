@@ -1,22 +1,45 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
-import csv
+from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-app.secret_key = 'qwerty'  # In production, use a strong random key
+app.secret_key = 'qwerty'  # Use a strong random key in production
 
+# Upload folder config
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# Database config
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///walkers.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Make sure upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Model for dog walkers
+class DogWalker(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    city = db.Column(db.String(100))
+    experience = db.Column(db.Integer)
+    availability = db.Column(db.String(100))
+    dog_size = db.Column(db.String(50))
+    photo = db.Column(db.String(200))
+
+# Allowed file extensions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Home
 @app.route('/')
 def home():
     return render_template('home.html')
 
+# Register walker
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -32,66 +55,43 @@ def register():
             filename = secure_filename(profile_pic.filename)
             profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        fieldnames = ['name', 'city', 'experience', 'availability', 'dog_size', 'photo']
-        new_row = {
-            'name': name,
-            'city': city,
-            'experience': experience,
-            'availability': ', '.join(availability),
-            'dog_size': dog_size,
-            'photo': filename
-        }
-
-        file_exists = os.path.isfile('registrations.csv')
-        with open('registrations.csv', mode='a', newline='', encoding='utf-8') as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-
-            if os.path.getsize('registrations.csv') == 0:
-                writer.writeheader()
-
-            writer.writerow(new_row)
+        new_walker = DogWalker(
+            name=name,
+            city=city,
+            experience=experience,
+            availability=', '.join(availability),
+            dog_size=dog_size,
+            photo=filename
+        )
+        db.session.add(new_walker)
+        db.session.commit()
 
         return render_template('thank_you.html', name=name)
 
     return render_template('register.html')
 
+# View walkers
 @app.route('/walkers')
 def walkers():
-    walkers = []
-    with open('registrations.csv', newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if any(row.values()):  # Skip empty rows
-                walkers.append(row)
+    all_walkers = DogWalker.query.all()
+    return render_template('walkers.html', walkers=all_walkers)
 
-    return render_template('walkers.html', walkers=walkers)
-
+# Remove walker (admin only)
 @app.route('/remove_walker', methods=['POST'])
 def remove_walker():
     if not session.get('admin'):
         return redirect(url_for('login'))
 
     walker_id = int(request.form['walker_id'])
+    walker = DogWalker.query.get(walker_id)
 
-    walkers = []
-    with open('registrations.csv', newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if any(row.values()):
-                walkers.append(row)
-
-    if 0 <= walker_id < len(walkers):
-        del walkers[walker_id]
-
-    fieldnames = ['name', 'city', 'experience', 'availability', 'dog_size', 'photo']
-    with open('registrations.csv', 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for walker in walkers:
-            writer.writerow(walker)
+    if walker:
+        db.session.delete(walker)
+        db.session.commit()
 
     return redirect(url_for('walkers'))
 
+# Admin login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -105,4 +105,3 @@ def login():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
