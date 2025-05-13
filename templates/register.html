@@ -1,35 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}Register Dog Walker{% endblock %}
+{% block title %}Register as a Dog Walker{% endblock %}
 
 {% block content %}
-<h2>Dog Walker Registration</h2>
-<form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data">
+<div class="container">
+  <h2>Register as a Dog Walker</h2>
 
-    <label>Name:</label><br>
-    <input type="text" name="name"><br><br>
-    
-    <label>City:</label><br>
-    <input type="text" name="city"><br><br>
-    
-    <label>Years of Experience:</label><br>
-    <input type="number" name="experience"><br><br>
+  {% if error %}
+    <div class="alert error">{{ error }}</div>
+  {% endif %}
+  {% if success %}
+    <div class="alert success">{{ success }}</div>
+  {% endif %}
 
-    <label>Availability:</label><br>
-    <input type="checkbox" name="availability" value="Morning"> Morning<br>
-    <input type="checkbox" name="availability" value="Afternoon"> Afternoon<br>
-    <input type="checkbox" name="availability" value="Evening"> Evening<br><br>
-
-    <label>Preferred Dog Size:</label><br>
-    <select name="dog_size">
+{% if success %}
+  <div class="alert success">{{ success }}</div>
+{% endif %}
+<form action="/register" method="POST" enctype="multipart/form-data" class="form-layout">
+    <div class="form-group">
+      <label>Name:</label>
+      <input type="text" name="name" required>
+    </div>
+  
+    <div class="form-group">
+      <label>City:</label>
+      <input type="text" name="city" required>
+    </div>
+  
+    <div class="form-group">
+      <label>Years of Experience:</label>
+      <input type="number" name="experience" required>
+    </div>
+  
+    <div class="form-group">
+      <label>Availability:</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="availability" value="Morning"> Morning</label>
+        <label><input type="checkbox" name="availability" value="Afternoon"> Afternoon</label>
+        <label><input type="checkbox" name="availability" value="Evening"> Evening</label>
+      </div>
+    </div>
+  
+    <div class="form-group">
+      <label>Preferred Dog Size:</label>
+      <select name="dog_size">
         <option value="Small">Small</option>
         <option value="Medium">Medium</option>
         <option value="Large">Large</option>
-    </select><br><br>
+      </select>
+    </div>
+  
+    <div class="form-group full-width">
+      <label>About Me:</label>
+      <textarea name="about_me" rows="4" required></textarea>
+    </div>
+  
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" name="email" required>
+    </div>
+  
+    <div class="form-group">
+      <label>Phone Number:</label>
+      <input type="text" name="phone" required>
+    </div>
+  
+    <div class="form-group">
+      <label>Profile Picture:</label>
+      <input type="file" name="profile_pic">
+    </div>
+  
+    <div class="form-group full-width">
+      <button type="submit" class="register-btn">Register</button>
+    </div>
+  </form>
+  {% endblock %}
 
-    <label>Profile Picture:</label><br>
-    <input type="file" name="profile_pic"><br><br>
-
-    <input type="submit" value="Register">
-</form>
-{% endblock %}

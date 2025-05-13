@@ -1,4 +1,4 @@
-#!/Users/betisateale/team_woff_registration/venv/bin/python3
+#!/Users/betisateale/team_woff_registration/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

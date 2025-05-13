@@ -1,52 +1,57 @@
-{% extends "base.html" %}
-
-{% block title %}Registered Walkers{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h2>All Registered Dog Walkers</h2>
+<main class="container">
+  <h2>All Registered Dog Walkers</h2>
 
-{% if walkers %}
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Name</th>
-        <th>City</th>
-        <th>Experience</th>
-        <th>Availability</th>
-        <th>Dog Size</th>
-        <th>Photo</th>
-        {% if session.get('admin') %}
-            <th>Remove</th>
-        {% endif %}
-    </tr>
-
-    {% for walker in walkers %}
-    <td>{{ walker['name'] }}</td>
-    <td>{{ walker['city'] }}</td>
-    <td>{{ walker['experience'] }}</td>
-    <td>{{ walker['availability'] }}</td>
-    <td>{{ walker['dog_size'] }}</td>
-    <td>
-        {% if walker['photo'] %}
-            <img src="{{ url_for('static', filename='uploads/' + walker['photo']) }}" alt="Profile Picture" width="80">
-        {% else %}
-            No photo
-        {% endif %}
-    </td>
-    
-        {% if session.get('admin') %}
-        <td>
-            <form method="POST" action="{{ url_for('remove_walker') }}">
-                <input type="hidden" name="walker_id" value="{{ loop.index0 }}">
-                <button type="submit">Remove</button>
-            </form>
-        </td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
+  {% if walkers|length == 0 %}
     <p>No dog walkers registered yet. 🐾</p>
-{% endif %}
+  {% else %}
+    <div class="table-container">  <!-- 👈 use the class you defined in CSS -->
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>City</th>
+            <th>Experience</th>
+            <th>Availability</th>
+            <th>Dog Size</th>
+            <th>About Me</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Photo</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for walker in walkers %}
+          <tr>
+            <td>{{ walker.name }}</td>
+            <td>{{ walker.city }}</td>
+            <td>{{ walker.experience }}</td>
+            <td>{{ walker.availability }}</td>
+            <td>{{ walker.dog_size }}</td>
+            <td class="about-me">{{ walker.about_me }}</td>
+            <td>{{ walker.email }}</td>
+            <td>{{ walker.phone }}</td>
+            <td>
+              {% if walker.photo %}
+                <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="{{ walker.name }}" class="profile-photo">
+              {% else %}
+                <span>No photo</span>
+              {% endif %}
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('remove_walker', id=walker.id) }}">
+                <button type="submit" class="remove-btn">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</main>
 {% endblock %}
-
 

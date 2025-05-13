@@ -3,21 +3,19 @@
 {% block title %}Welcome to Team Woff{% endblock %}
 
 {% block content %}
-<main>
-    <h1 style="text-align:center;">🐾 Welcome to Team Woff 🐾</h1>
-    <p style="text-align:center; font-size: 1.2em; color: #555;">
+<div class="home-wrapper">
+    <h1>🐾 Welcome to Team Woff 🐾</h1>
+    <p>
         Connecting dog lovers with trusted walkers near you!
     </p>
 
     <img src="{{ url_for('static', filename='images/otis.jpg') }}" alt="Otis the Dog" class="hero-img">
 
-    <div style="text-align:center; margin-top: 20px;">
-        <a href="{{ url_for('register') }}" style="margin-right: 20px; color: #4b6584; font-weight: bold;">
-            Register as a Walker
-        </a>
-        <a href="{{ url_for('walkers') }}" style="color: #4b6584; font-weight: bold;">
-            View Walkers
-        </a>
+    <div class="home-links">
+        <a href="{{ url_for('register') }}">Register as a Walker</a>
+        <a href="{{ url_for('walkers') }}">View Walkers</a>
     </div>
-</main>
+</div>
 {% endblock %}
+
+
