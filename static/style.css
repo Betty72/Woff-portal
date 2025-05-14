@@ -212,8 +212,25 @@ input, select, textarea {
     font-size: 18px;
     color: #555;
 }
+.home-links a.admin-link {
+    margin-left: 20px;
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.1em;
+}
 
-
+.home-links a.admin-link:hover {
+    text-decoration: underline;
+}
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 
 
     

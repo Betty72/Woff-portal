@@ -2,12 +2,13 @@
 
 {% block content %}
 <main class="container">
-  <h2>All Registered Dog Walkers</h2>
 
+  <h2>All Registered Dog Walkers</h2>
+  
   {% if walkers|length == 0 %}
     <p>No dog walkers registered yet. 🐾</p>
   {% else %}
-    <div class="table-container">  <!-- 👈 use the class you defined in CSS -->
+    <div class="table-container">
       <table>
         <thead>
           <tr>
@@ -20,7 +21,9 @@
             <th>Email</th>
             <th>Phone</th>
             <th>Photo</th>
-            <th>Action</th>
+            {% if session.get('admin') %}
+              <th>Action</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
@@ -39,13 +42,15 @@
                 <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="{{ walker.name }}" class="profile-photo">
               {% else %}
                 <span>No photo</span>
-              {% endif %}
+                {% endif %}
+                {% if session.get('admin') %}
             </td>
             <td>
-              <form method="POST" action="{{ url_for('remove_walker', id=walker.id) }}">
+              <form method="POST" action="{{ url_for('remove_walker_by_id', id=walker.id) }}">
                 <button type="submit" class="remove-btn">Remove</button>
               </form>
             </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
@@ -54,4 +59,3 @@
   {% endif %}
 </main>
 {% endblock %}
-

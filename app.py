@@ -92,6 +92,7 @@ def register():
         db.session.commit()
 
         return render_template("register.html", success="Registration successful!")
+        
 
     # GET request
     return render_template('register.html')
@@ -99,44 +100,55 @@ def register():
 # View walkers
 @app.route('/walkers')
 def walkers():
+    
     all_walkers = DogWalker.query.all()
     return render_template('walkers.html', walkers=all_walkers)
-    
-# Remove walker (admin only)
-@app.route('/remove_walker', methods=['POST'])
-def remove_walker():
+# remove walker
+@app.route('/remove_walker/<int:id>', methods=['POST'])
+def remove_walker_by_id(id):
     if not session.get('admin'):
         return redirect(url_for('login'))
 
-    walker_id = int(request.form['walker_id'])
-    walker = DogWalker.query.get(walker_id)
-
+    walker = DogWalker.query.get(id)
     if walker:
         db.session.delete(walker)
         db.session.commit()
 
     return redirect(url_for('walkers'))
-# Admin login
+
+    
+
+# Admin Login Route
+# ----------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         password = request.form['password']
-        
+
+        # Check the submitted password against the hashed version
         if check_password_hash(hashed_password, password):
             session['admin'] = True
             return redirect(url_for('walkers'))
         else:
             return render_template('login.html', error='Incorrect password')
-    
+
     return render_template('login.html')
-    # logout
+
+
+
+
+
+# ----------------------------
+# Admin Logout Route
+# ----------------------------
 @app.route('/logout')
 def logout():
     session.pop('admin', None)
     return redirect(url_for('login'))
 
 
+# ----------------------------
+# Run App
+# ----------------------------
 if __name__ == '__main__':
     app.run(debug=True)
-    # Deploy trigger
-
