@@ -5,16 +5,15 @@
 {% block content %}
 <div class="home-wrapper">
     <h1>🐾 Welcome to Team Woff 🐾</h1>
-    <p>
+    <p class="intro-text">
         Connecting dog lovers with trusted walkers near you!
     </p>
 
     <img src="{{ url_for('static', filename='images/otis.jpg') }}" alt="Otis the Dog" class="hero-img">
 
-    <div class="home-links">
-        <a href="{{ url_for('register') }}">Register as a Walker</a>
-        <a href="{{ url_for('walkers') }}">View Walkers</a>
-        <a href="{{ url_for('login') }}" class="admin-link">Admin Login</a>  <!-- 👈 New link -->
+    <div class="cta-buttons">
+        <a href="{{ url_for('walkers') }}" class="btn-primary">View Walkers</a>
+        <a href="{{ url_for('register') }}" class="btn-secondary">Become a Walker</a>
     </div>
 </div>
 {% endblock %}
