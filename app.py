@@ -182,10 +182,6 @@ def login():
 
     return render_template('login.html')
 
-
-
-
-
 # ----------------------------
 # Admin Logout Route
 @app.route('/logout')
@@ -194,8 +190,18 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for('home'))
 
+# About us
+@app.route('/about')
+def about():
+    return render_template('about.html')
+# Meet our CEO 
+@app.route('/ceo')
+def ceo():
+    return render_template('ceo.html')
 # ----------------------------
 # Run App
 # ----------------------------
 if __name__ == '__main__':
     app.run(debug=True)
+
+
