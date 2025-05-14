@@ -406,3 +406,47 @@ input, select, textarea {
 .btn-secondary:hover {
     background-color: #0056b3;
 }
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px; /* ensures content doesn't shrink too tight */
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+
+.profile-photo {
+    max-width: 80px;
+    border-radius: 8px;
+}
+
+.about-me {
+    max-width: 200px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+@media screen and (max-width: 768px) {
+    .table-container {
+        overflow-x: scroll;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 8px 10px;
+    }
+}
