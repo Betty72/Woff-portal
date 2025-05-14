@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>📅 Book {{ walker.name }}</h2>
+    <form method="POST" class="booking-form">
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" required>
+
+        <label for="time_of_day">Time of Day:</label>
+        <select name="time_of_day" id="time_of_day" required>
+            <option value="">-- Select Time --</option>
+            <option value="Morning">Morning</option>
+            <option value="Afternoon">Afternoon</option>
+            <option value="Evening">Evening</option>
+        </select>
+
+        <label for="message">Message (optional):</label>
+        <textarea name="message" id="message" rows="4" placeholder="Any special instructions?"></textarea>
+
+        <button type="submit" class="book-now-btn">✅ Confirm Booking</button>
+    </form>
+</div>
+{% endblock %}
+

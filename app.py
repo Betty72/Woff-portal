@@ -1,11 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from flask import flash
+from flask_mail import Mail, Message
+
 import os
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+# 💌 Mail configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'betisasg@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mpwoltdyxfmghemb'  # Use your generated app password
+app.config['MAIL_DEFAULT_SENDER'] = 'betisasg@gmail.com'
+
+mail = Mail(app)
+
 
 # Hashed version of 'admin123' generated once beforehand
 hashed_password = 'pbkdf2:sha256:1000000$d222IyRYnUcVwZPu$15b2588740c2efa31a04e677ec103cf4e2198264cdf00db4dc7662aea9b7a0f8'
@@ -96,14 +109,13 @@ def register():
 
     # GET request
     return render_template('register.html')
-
-# View walkers
+    # View walkers
 @app.route('/walkers')
 def walkers():
-    
     all_walkers = DogWalker.query.all()
     return render_template('walkers.html', walkers=all_walkers)
-# remove walker
+
+# Remove walker
 @app.route('/remove_walker/<int:id>', methods=['POST'])
 def remove_walker_by_id(id):
     if not session.get('admin'):
@@ -116,7 +128,43 @@ def remove_walker_by_id(id):
 
     return redirect(url_for('walkers'))
 
-    
+
+# ✅ Booking route (must be OUTSIDE of remove_walker_by_id!)
+@app.route('/book/<int:id>', methods=['GET', 'POST'])
+def book_walker(id):
+    walker = DogWalker.query.get_or_404(id)
+
+    if request.method == 'POST':
+        date = request.form['date']
+        time_of_day = request.form['time_of_day']
+        message = request.form.get('message')
+
+        # Send email to the walker
+        email_body = f"""
+        Hello {walker.name},
+
+        Someone has booked a dog walk with you! 🐾
+
+        📅 Date: {date}
+        🕒 Time: {time_of_day}
+        ✉️ Message: {message or 'No message provided'}
+
+        Please log in to confirm the booking.
+
+        — Team Woff
+        """
+
+        try:
+            msg = Message("📅 New Dog Walk Booking!", recipients=[walker.email])
+            msg.body = email_body
+            mail.send(msg)
+            flash("Booking submitted and confirmation email sent!", "success")
+        except Exception as e:
+            flash(f"Booking submitted but email failed: {e}", "error")
+
+        return redirect(url_for('walkers'))
+
+    return render_template('book_walker.html', walker=walker)
 
 # Admin Login Route
 # ----------------------------
@@ -140,12 +188,11 @@ def login():
 
 # ----------------------------
 # Admin Logout Route
-# ----------------------------
 @app.route('/logout')
 def logout():
     session.pop('admin', None)
-    return redirect(url_for('login'))
-
+    flash("You have been logged out.", "info")
+    return redirect(url_for('home'))
 
 # ----------------------------
 # Run App
