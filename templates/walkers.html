@@ -2,7 +2,6 @@
 
 {% block content %}
 <main class="container">
-
   <h2>All Registered Dog Walkers</h2>
   
   {% if walkers|length == 0 %}
@@ -22,8 +21,11 @@
             <th>Phone</th>
             <th>Photo</th>
             {% if not session.get('admin') %}
-            <th>Book</th>
-          {% endif %}          
+              <th>Book</th>
+            {% endif %}
+            {% if session.get('admin') %}
+              <th>Action</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
@@ -42,15 +44,16 @@
                 <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="{{ walker.name }}" class="profile-photo">
               {% else %}
                 <span>No photo</span>
-                {% endif %}
-                </td>
-                {% if not session.get('admin') %}
-                <td>
-                <a href="{{ url_for('book_walker', id=walker.id) }}" class="book-button">📅 Book</a>
-                </td>
-                {% endif %}
-                {% if session.get('admin') %}
+              {% endif %}
             </td>
+
+            {% if not session.get('admin') %}
+            <td>
+              <a href="{{ url_for('book_walker', id=walker.id) }}" class="book-button">📅 Book</a>
+            </td>
+            {% endif %}
+
+            {% if session.get('admin') %}
             <td>
               <form method="POST" action="{{ url_for('remove_walker_by_id', id=walker.id) }}">
                 <button type="submit" class="remove-btn">Remove</button>
