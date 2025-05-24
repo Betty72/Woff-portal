@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-container">
+    <h2>Edit Your Info 📝</h2>
+
+    <form method="post">
+        Name: <input type="text" name="name" value="{{ walker.name }}"><br><br>
+        City: <input type="text" name="city" value="{{ walker.city }}"><br><br>
+        Experience: <input type="text" name="experience" value="{{ walker.experience }}"><br><br>
+        
+        Availability:<br>
+        <input type="checkbox" name="availability" value="Morning" {% if 'Morning' in walker.availability %}checked{% endif %}> Morning
+        <input type="checkbox" name="availability" value="Afternoon" {% if 'Afternoon' in walker.availability %}checked{% endif %}> Afternoon
+        <input type="checkbox" name="availability" value="Evening" {% if 'Evening' in walker.availability %}checked{% endif %}> Evening
+        <br><br>
+
+        Dog Size:
+        <select name="dog_size">
+            <option value="Small" {% if walker.dog_size == 'Small' %}selected{% endif %}>Small</option>
+            <option value="Medium" {% if walker.dog_size == 'Medium' %}selected{% endif %}>Medium</option>
+            <option value="Large" {% if walker.dog_size == 'Large' %}selected{% endif %}>Large</option>
+        </select><br><br>
+
+        About Me:<br>
+        <textarea name="about_me">{{ walker.about_me }}</textarea><br><br>
+
+        Phone: <input type="text" name="phone" value="{{ walker.phone }}"><br><br>
+
+        Price Morning: <input type="number" name="price_morning" value="{{ walker.price_morning }}"><br>
+        Price Afternoon: <input type="number" name="price_afternoon" value="{{ walker.price_afternoon }}"><br>
+        Price Evening: <input type="number" name="price_evening" value="{{ walker.price_evening }}"><br><br>
+
+        <input type="submit" value="Save Changes" class="btn btn-primary">
+    </form>
+
+    <a href="{{ url_for('walker_dashboard') }}" class="btn btn-secondary">Cancel</a>
+</div>
+{% endblock %}

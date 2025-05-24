@@ -222,15 +222,7 @@ input, select, textarea {
 .home-links a.admin-link:hover {
     text-decoration: underline;
 }
-.login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
+
 .flash-messages {
     margin: 20px auto;
     width: 80%;
@@ -388,6 +380,15 @@ input, select, textarea {
     text-decoration: none;
     font-weight: bold;
 }
+.btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 10px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
 
 .btn-primary {
     background-color: #28a745;
@@ -406,6 +407,15 @@ input, select, textarea {
 .btn-secondary:hover {
     background-color: #0056b3;
 }
+/* 💜 Purple button - for Walker Login */
+.btn-purple {
+    background-color: #6f42c1;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: #5936a2;
+}
+
 .table-container {
     overflow-x: auto;
     margin-top: 20px;
@@ -457,5 +467,93 @@ th, td {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+.login-container {
+    max-width: 500px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 30px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.login-container form input[type="email"],
+.login-container form input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+.login-container form input[type="submit"] {
+    margin-top: 20px;
+}
+.dashboard-container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-radius: 14px;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+.dashboard-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.dashboard-container p {
+    font-size: 1.2em;
+    color: #666;
+}
+
+.btn {
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 10px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-purple {
+    background-color: #6f42c1;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: #5936a2;
+}
+.dashboard-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+.booking-card {
+    background: white;
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+    text-align: left;
+}
+
+.booking-card p {
+    margin: 5px 0;
+}
+
 
 

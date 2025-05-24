@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask import flash
 from flask_mail import Mail, Message
-
+from werkzeug.security import generate_password_hash
 import os
 
 app = Flask(__name__)
@@ -60,6 +60,22 @@ class DogWalker(db.Model):
     price_morning = db.Column(db.Integer)
     price_afternoon = db.Column(db.Integer)
     price_evening = db.Column(db.Integer)
+    password_hash = db.Column(db.String(256))
+class Booking(db.Model):
+    __tablename__ = 'booking'
+
+    id = db.Column(db.Integer, primary_key=True)
+    walker_id = db.Column(db.Integer, db.ForeignKey('dog_walker.id'), nullable=False)
+    date = db.Column(db.String(20))
+    time_of_day = db.Column(db.String(20))
+    message = db.Column(db.Text)
+    owner_email = db.Column(db.String(100))
+    owner_phone = db.Column(db.String(20))
+    status = db.Column(db.String(20), default='Pending')
+
+
+    
+
 
 # Allowed file extensions
 def allowed_file(filename):
@@ -74,6 +90,9 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        password = request.form['password']
+        hashed_pw = generate_password_hash(password)
+
         name = request.form['name']
         city = request.form['city']
         experience = request.form['experience']
@@ -85,6 +104,7 @@ def register():
         price_morning = request.form.get('price_morning')
         price_afternoon = request.form.get('price_afternoon')
         price_evening = request.form.get('price_evening')
+
 
 
 
@@ -112,7 +132,8 @@ def register():
             phone=phone,
             price_morning=price_morning,
             price_afternoon=price_afternoon,
-            price_evening=price_evening
+            price_evening=price_evening,
+            password_hash=hashed_pw
 
         )
 
@@ -143,7 +164,6 @@ def remove_walker_by_id(id):
 
     return redirect(url_for('walkers'))
 
-
 @app.route('/book/<int:id>', methods=['GET', 'POST'])
 def book_walker(id):
     walker = DogWalker.query.get_or_404(id)
@@ -158,8 +178,24 @@ def book_walker(id):
         date = request.form['date']
         time_of_day = request.form['time_of_day']
         message = request.form.get('message')
+        owner_email = request.form['owner_email']
+        owner_phone = request.form['owner_phone']
 
-        # Send email to the walker
+        # 💾 Save the booking to the database
+        new_booking = Booking(
+            walker_id=walker.id,
+            date=date,
+            time_of_day=time_of_day,
+            message=message,
+            owner_email=owner_email,
+            owner_phone=owner_phone,
+            status='Pending'
+        )
+
+        db.session.add(new_booking)
+        db.session.commit()
+
+        # 📧 Send email to the walker
         email_body = f"""
         Hello {walker.name},
 
@@ -186,6 +222,102 @@ def book_walker(id):
 
     # GET request
     return render_template('book_walker.html', walker=walker, prices=prices)
+
+# Booking Response
+@app.route('/respond_booking/<int:booking_id>', methods=['POST'])
+def respond_booking(booking_id):
+    if 'walker_id' not in session:
+        return redirect(url_for('walker_login'))
+
+    booking = Booking.query.get_or_404(booking_id)
+    action = request.form['action']
+
+    if action == 'confirm':
+        booking.status = 'Confirmed'
+        message = "🎉 Your booking has been confirmed!"
+    else:
+        booking.status = 'Rejected'
+        message = "😢 Your booking was rejected. Feel free to try another walker!"
+
+    db.session.commit()
+
+    # Send email to owner
+    try:
+        msg = Message("🐾 Booking Update from Team Woff", recipients=[booking.owner_email])
+        msg.body = f"""
+Hello from Team Woff!
+
+Status update on your booking request:
+📅 Date: {booking.date}
+🕒 Time: {booking.time_of_day}
+
+{message}
+
+Thanks for using Team Woff!
+        """
+        mail.send(msg)
+        flash("Response sent and email delivered!", "success")
+    except Exception as e:
+        flash(f"Response saved, but email failed: {e}", "error")
+
+    return redirect(url_for('walker_dashboard'))
+
+# walker login
+@app.route('/walker_login', methods=['GET', 'POST'])
+def walker_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        walker = DogWalker.query.filter_by(email=email).first()
+
+        if walker and walker.password_hash and check_password_hash(walker.password_hash, password):
+            session['walker_id'] = walker.id
+            flash("Login successful! 🐶", "success")
+            return redirect(url_for('walker_dashboard'))
+        else:
+            flash("Invalid email or password.", "error")
+            return redirect(url_for('walker_login'))
+
+    # Only hit this part on GET
+    return render_template('walker_login.html')
+
+# Walkers dashboard
+@app.route('/walker_dashboard')
+def walker_dashboard():
+    if 'walker_id' not in session:
+        return redirect(url_for('walker_login'))
+
+    walker = DogWalker.query.get(session['walker_id'])
+    bookings = Booking.query.filter_by(walker_id=walker.id).all()
+
+    return render_template('walker_dashboard.html', walker=walker, bookings=bookings)
+
+# Walkers update
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'walker_id' not in session:
+        return redirect(url_for('walker_login'))
+
+    walker = DogWalker.query.get(session['walker_id'])
+
+    if request.method == 'POST':
+        walker.name = request.form['name']
+        walker.city = request.form['city']
+        walker.experience = request.form['experience']
+        walker.availability = ', '.join(request.form.getlist('availability'))
+        walker.dog_size = request.form['dog_size']
+        walker.about_me = request.form['about_me']
+        walker.phone = request.form['phone']
+        walker.price_morning = request.form.get('price_morning')
+        walker.price_afternoon = request.form.get('price_afternoon')
+        walker.price_evening = request.form.get('price_evening')
+
+        db.session.commit()
+        flash("Your profile has been updated!", "success")
+        return redirect(url_for('walker_dashboard'))
+
+    return render_template('edit_profile.html', walker=walker)
+
 
 # Admin Login Route
 # ----------------------------
