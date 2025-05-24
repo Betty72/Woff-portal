@@ -45,6 +45,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Model for dog walkers
 class DogWalker(db.Model):
+    __tablename__ = 'dog_walker'  # 💥 THIS is the missing line
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     city = db.Column(db.String(100))
@@ -52,9 +54,13 @@ class DogWalker(db.Model):
     availability = db.Column(db.String(100))
     dog_size = db.Column(db.String(100))
     photo = db.Column(db.String(200))
-    about_me = db.Column(db.Text)            # 🧍‍♀️ New!
-    email = db.Column(db.String(100))        # 📧 New!
-    phone = db.Column(db.String(20))         # 📞 New!
+    about_me = db.Column(db.Text)
+    email = db.Column(db.String(100))
+    phone = db.Column(db.String(20))
+    price_morning = db.Column(db.Integer)
+    price_afternoon = db.Column(db.Integer)
+    price_evening = db.Column(db.Integer)
+
 # Allowed file extensions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -76,6 +82,11 @@ def register():
         about_me = request.form['about_me']
         email = request.form['email']
         phone = request.form['phone']
+        price_morning = request.form.get('price_morning')
+        price_afternoon = request.form.get('price_afternoon')
+        price_evening = request.form.get('price_evening')
+
+
 
         # Check required fields manually
         if not name or not email or not city or not experience:
@@ -98,7 +109,11 @@ def register():
             photo=filename,
             about_me=about_me,
             email=email,
-            phone=phone
+            phone=phone,
+            price_morning=price_morning,
+            price_afternoon=price_afternoon,
+            price_evening=price_evening
+
         )
 
         db.session.add(new_walker)
@@ -129,10 +144,15 @@ def remove_walker_by_id(id):
     return redirect(url_for('walkers'))
 
 
-# ✅ Booking route (must be OUTSIDE of remove_walker_by_id!)
 @app.route('/book/<int:id>', methods=['GET', 'POST'])
 def book_walker(id):
     walker = DogWalker.query.get_or_404(id)
+
+    prices = {
+        "Morning": walker.price_morning,
+        "Afternoon": walker.price_afternoon,
+        "Evening": walker.price_evening
+    }
 
     if request.method == 'POST':
         date = request.form['date']
@@ -164,7 +184,8 @@ def book_walker(id):
 
         return redirect(url_for('walkers'))
 
-    return render_template('book_walker.html', walker=walker)
+    # GET request
+    return render_template('book_walker.html', walker=walker, prices=prices)
 
 # Admin Login Route
 # ----------------------------

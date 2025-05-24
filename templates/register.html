@@ -1,78 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}Register as a Dog Walker{% endblock %}
+{% block title %}🐶 Register as a Dog Walker{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h2>Register as a Dog Walker</h2>
+<div class="container" style="max-width: 850px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 6px 25px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif;">
+  <h2 style="text-align: center; margin-bottom: 25px; font-size: 2em;">🐾 Register as a Dog Walker 🐾</h2>
 
-  {% if error %}
-    <div class="alert error">{{ error }}</div>
-  {% endif %}
-  {% if success %}
-    <div class="alert success">{{ success }}</div>
-  {% endif %}
+  <form method="POST" enctype="multipart/form-data">
 
-{% if success %}
-  <div class="alert success">{{ success }}</div>
-{% endif %}
-<form action="/register" method="POST" enctype="multipart/form-data" class="form-layout">
-    <div class="form-group">
-      <label>Name:</label>
-      <input type="text" name="name" required>
-    </div>
-  
-    <div class="form-group">
-      <label>City:</label>
-      <input type="text" name="city" required>
-    </div>
-  
-    <div class="form-group">
-      <label>Years of Experience:</label>
-      <input type="number" name="experience" required>
-    </div>
-  
-    <div class="form-group">
-      <label>Availability:</label>
-      <div class="checkbox-group">
-        <label><input type="checkbox" name="availability" value="Morning"> Morning</label>
-        <label><input type="checkbox" name="availability" value="Afternoon"> Afternoon</label>
-        <label><input type="checkbox" name="availability" value="Evening"> Evening</label>
+    <!-- Row 1: Name / City -->
+    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <label>Name:</label>
+        <input type="text" name="name" class="form-control" placeholder="e.g. Otis Barkinson" required>
+      </div>
+      <div style="flex: 1;">
+        <label>City:</label>
+        <input type="text" name="city" class="form-control" placeholder="e.g. Stockholm" required>
       </div>
     </div>
-  
-    <div class="form-group">
-      <label>Preferred Dog Size:</label>
-      <select name="dog_size">
-        <option value="Small">Small</option>
-        <option value="Medium">Medium</option>
-        <option value="Large">Large</option>
-      </select>
+
+    <!-- Row 2: Experience / Dog Size -->
+    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <label>Years of Experience:</label>
+        <input type="number" name="experience" class="form-control" placeholder="e.g. 2" required>
+      </div>
+      <div style="flex: 1;">
+        <label>Preferred Dog Size:</label>
+        <select name="dog_size" class="form-control" required>
+          <option value="Small">🐕 Small</option>
+          <option value="Medium">🐕‍🦺 Medium</option>
+          <option value="Large">🦮 Large</option>
+        </select>
+      </div>
     </div>
-  
-    <div class="form-group full-width">
+
+    <!-- Availability & Price Section -->
+    <div style="margin-bottom: 25px;">
+      <label style="font-weight: bold;">Availability & Price per Time Slot:</label>
+
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+        <input type="checkbox" id="morningCheck" name="availability" value="Morning" onchange="togglePrice('morning')">
+        <span>🌅 Morning</span>
+        <input type="number" name="price_morning" id="price_morning" placeholder="e.g. 100" style="width: 100px;" disabled> SEK
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+        <input type="checkbox" id="afternoonCheck" name="availability" value="Afternoon" onchange="togglePrice('afternoon')">
+        <span>☀️ Afternoon</span>
+        <input type="number" name="price_afternoon" id="price_afternoon" placeholder="e.g. 120" style="width: 100px;" disabled> SEK
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+        <input type="checkbox" id="eveningCheck" name="availability" value="Evening" onchange="togglePrice('evening')">
+        <span>🌙 Evening</span>
+        <input type="number" name="price_evening" id="price_evening" placeholder="e.g. 140" style="width: 100px;" disabled> SEK
+      </div>
+    </div>
+
+    <!-- About Me -->
+    <div style="margin-bottom: 15px;">
       <label>About Me:</label>
-      <textarea name="about_me" rows="4" required></textarea>
+      <textarea name="about_me" rows="4" class="form-control" placeholder="e.g. I love long walks, cuddles, and I'm trained in basic obedience. 🐾" required></textarea>
     </div>
-  
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="email" name="email" required>
+
+    <!-- Email / Phone -->
+    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <label>Email:</label>
+        <input type="email" name="email" class="form-control" placeholder="e.g. doglover@teamwoff.com" required>
+      </div>
+      <div style="flex: 1;">
+        <label>Phone Number:</label>
+        <input type="text" name="phone" class="form-control" placeholder="e.g. +46 701234567" required>
+      </div>
     </div>
-  
-    <div class="form-group">
-      <label>Phone Number:</label>
-      <input type="text" name="phone" required>
-    </div>
-  
-    <div class="form-group">
+
+    <!-- Profile Picture -->
+    <div style="margin-bottom: 20px;">
       <label>Profile Picture:</label>
-      <input type="file" name="profile_pic">
+      <input type="file" name="profile_pic" class="form-control">
     </div>
-  
-    <div class="form-group full-width">
-      <button type="submit" class="register-btn">Register</button>
+
+    <!-- Submit -->
+    <div style="text-align: center;">
+      <button type="submit" class="btn btn-success" style="padding: 12px 30px; font-size: 1.1em; border-radius: 8px;">🐾 Register Now</button>
     </div>
+
   </form>
-  {% endblock %}
+</div>
+
+<script>
+  function togglePrice(time) {
+    const check = document.getElementById(`${time}Check`);
+    const price = document.getElementById(`price_${time}`);
+    price.disabled = !check.checked;
+    if (!check.checked) {
+      price.value = '';
+    }
+  }
+</script>
+{% endblock %}
+
+
+
+
 

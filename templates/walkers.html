@@ -15,11 +15,13 @@
             <th>City</th>
             <th>Experience</th>
             <th>Availability</th>
+            <th>Price (SEK)</th>
             <th>Dog Size</th>
             <th>About Me</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Photo</th>
+
             {% if not session.get('admin') %}
               <th>Book</th>
             {% endif %}
@@ -35,10 +37,17 @@
             <td>{{ walker.city }}</td>
             <td>{{ walker.experience }}</td>
             <td>{{ walker.availability }}</td>
+            <td>
+                {% if walker.price_morning %}🌅 {{ walker.price_morning }} SEK<br>{% endif %}
+                {% if walker.price_afternoon %}☀️ {{ walker.price_afternoon }} SEK<br>{% endif %}
+                {% if walker.price_evening %}🌙 {{ walker.price_evening }} SEK{% endif %}
+              </td>
+              
             <td>{{ walker.dog_size }}</td>
             <td class="about-me">{{ walker.about_me }}</td>
             <td>{{ walker.email }}</td>
             <td>{{ walker.phone }}</td>
+            
             <td>
               {% if walker.photo %}
                 <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="{{ walker.name }}" class="profile-photo">

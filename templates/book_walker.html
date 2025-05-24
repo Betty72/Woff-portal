@@ -1,25 +1,62 @@
-{% extends 'base.html' %}
+<h2 style="text-align: center; margin-top: 20px;">📅 Book a Walk with {{ walker.name }}</h2>
 
-{% block content %}
-<div class="container">
-    <h2>📅 Book {{ walker.name }}</h2>
-    <form method="POST" class="booking-form">
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" required>
+<div class="container" style="max-width: 600px; margin: 30px auto; padding: 25px; background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); font-family: 'Poppins', sans-serif;">
+  <form method="POST">
+    
+    <!-- Date Picker -->
+    <div style="margin-bottom: 20px;">
+      <label for="date" style="font-weight: 500;">Select Date:</label>
+      <input type="date" name="date" class="form-control" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+    </div>
 
-        <label for="time_of_day">Time of Day:</label>
-        <select name="time_of_day" id="time_of_day" required>
-            <option value="">-- Select Time --</option>
-            <option value="Morning">Morning</option>
-            <option value="Afternoon">Afternoon</option>
-            <option value="Evening">Evening</option>
-        </select>
+    <!-- Time of Day Selector -->
+    <div style="margin-bottom: 20px;">
+      <label for="time_of_day" style="font-weight: 500;">Preferred Time of Day:</label>
+      <select id="time_of_day" name="time_of_day" onchange="showPrice()" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+        {% set availability = walker.availability.split(', ') %}
+        {% if 'Morning' in availability %}
+          <option value="Morning">🌅 Morning</option>
+        {% endif %}
+        {% if 'Afternoon' in availability %}
+          <option value="Afternoon">☀️ Afternoon</option>
+        {% endif %}
+        {% if 'Evening' in availability %}
+          <option value="Evening">🌙 Evening</option>
+        {% endif %}
+      </select>
+    </div>
 
-        <label for="message">Message (optional):</label>
-        <textarea name="message" id="message" rows="4" placeholder="Any special instructions?"></textarea>
+    <!-- Price Display -->
+    <div id="priceDisplay" style="font-weight: bold; margin-bottom: 20px; font-size: 1.1em; color: #2c3e50;"></div>
 
-        <button type="submit" class="book-now-btn">✅ Confirm Booking</button>
-    </form>
+    <!-- Optional Message -->
+    <div style="margin-bottom: 25px;">
+      <label for="message" style="font-weight: 500;">Optional Message:</label>
+      <textarea name="message" class="form-control" rows="3" placeholder="e.g. Please ring the doorbell, don't knock 🐾" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="text-align: center;">
+      <button type="submit" class="btn btn-success" style="padding: 12px 30px; font-size: 1.1em; border-radius: 8px;">🐶 Confirm Booking</button>
+    </div>
+
+  </form>
 </div>
-{% endblock %}
 
+<!-- Price Logic Script -->
+<script>
+  const prices = JSON.parse('{{ prices | tojson | safe }}');
+
+  function showPrice() {
+    const time = document.getElementById('time_of_day').value;
+    const price = prices[time];
+    document.getElementById('priceDisplay').innerText = price ? `💰 ${price} SEK` : '';
+  }
+
+  // Initialize on page load
+  window.onload = showPrice;
+</script>
+
+
+  
+  
