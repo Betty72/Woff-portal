@@ -554,6 +554,13 @@ th, td {
 .booking-card p {
     margin: 5px 0;
 }
-
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+  }
 
 
