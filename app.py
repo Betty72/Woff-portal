@@ -84,7 +84,8 @@ def allowed_file(filename):
 # Home
 @app.route('/')
 def home():
-    return render_template('home.html')
+    walkers = DogWalker.query.limit(3).all()  # Show only 3 for homepage
+    return render_template('index.html', walkers=walkers)
 
 # Register walker
 @app.route('/register', methods=['GET', 'POST'])
@@ -149,6 +150,7 @@ def register():
 @app.route('/walkers')
 def walkers():
     all_walkers = DogWalker.query.all()
+    flash("No walkers found yet. 🐾", "info")
     return render_template('walkers.html', walkers=all_walkers)
 
 # Remove walker
@@ -161,9 +163,11 @@ def remove_walker_by_id(id):
     if walker:
         db.session.delete(walker)
         db.session.commit()
-
+    
+    flash('Walker removed successfully!')
     return redirect(url_for('walkers'))
 
+#Book a walker 
 @app.route('/book/<int:id>', methods=['GET', 'POST'])
 def book_walker(id):
     walker = DogWalker.query.get_or_404(id)
@@ -281,7 +285,7 @@ def walker_login():
     # Only hit this part on GET
     return render_template('walker_login.html')
 
-# Walkers dashboard
+# Walkers dashboard login
 @app.route('/walker_dashboard')
 def walker_dashboard():
     if 'walker_id' not in session:
@@ -289,9 +293,7 @@ def walker_dashboard():
 
     walker = DogWalker.query.get(session['walker_id'])
     bookings = Booking.query.filter_by(walker_id=walker.id).all()
-
     return render_template('walker_dashboard.html', walker=walker, bookings=bookings)
-
 # Walkers update
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
@@ -322,11 +324,16 @@ def edit_profile():
 # Admin Login Route
 # ----------------------------
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def admin_login():
     if request.method == 'POST':
         password = request.form['password']
 
-        # Check the submitted password against the hashed version
+        # TEMPORARY: skip password check
+        if password == 'letmein':
+            session['admin'] = True
+            return redirect(url_for('walkers'))
+
+        # Real check (leave this here)
         if check_password_hash(hashed_password, password):
             session['admin'] = True
             return redirect(url_for('walkers'))
@@ -336,12 +343,23 @@ def login():
     return render_template('login.html')
 
 # ----------------------------
-# Admin Logout Route
-@app.route('/logout')
-def logout():
-    session.pop('admin', None)
-    flash("You have been logged out.", "info")
+# Walker Logout
+@app.route('/walker_logout', methods=['POST'])
+def walker_logout():
+    if 'walker_id' in session:
+        session.pop('walker_id')
+        flash("Walker logged out.", "success")
     return redirect(url_for('home'))
+
+# Admin Logout
+@app.route('/admin_logout', methods=['POST'])
+def admin_logout():
+    if 'admin' in session:
+        session.pop('admin')
+        flash("Admin logged out.", "success")
+    return redirect(url_for('home'))
+
+
 
 # About us
 @app.route('/about')

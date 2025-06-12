@@ -1,79 +1,33 @@
 {% extends 'base.html' %}
 
+{% block title %}Find Walkers – Team Woff{% endblock %}
+
 {% block content %}
-<main class="container">
-  <h2>All Registered Dog Walkers</h2>
-  
-  {% if walkers|length == 0 %}
-    <p>No dog walkers registered yet. 🐾</p>
-  {% else %}
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>City</th>
-            <th>Experience</th>
-            <th>Availability</th>
-            <th>Price (SEK)</th>
-            <th>Dog Size</th>
-            <th>About Me</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Photo</th>
+  <section class="hero">
+    <h2>Available Dog Walkers</h2>
+    <p>Browse registered dog walkers and book your favorite match 🐶💼</p>
+  </section>
 
-            {% if not session.get('admin') %}
-              <th>Book</th>
-            {% endif %}
-            {% if session.get('admin') %}
-              <th>Action</th>
-            {% endif %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for walker in walkers %}
-          <tr>
-            <td>{{ walker.name }}</td>
-            <td>{{ walker.city }}</td>
-            <td>{{ walker.experience }}</td>
-            <td>{{ walker.availability }}</td>
-            <td>
-                {% if walker.price_morning %}🌅 {{ walker.price_morning }} SEK<br>{% endif %}
-                {% if walker.price_afternoon %}☀️ {{ walker.price_afternoon }} SEK<br>{% endif %}
-                {% if walker.price_evening %}🌙 {{ walker.price_evening }} SEK{% endif %}
-              </td>
-              
-            <td>{{ walker.dog_size }}</td>
-            <td class="about-me">{{ walker.about_me }}</td>
-            <td>{{ walker.email }}</td>
-            <td>{{ walker.phone }}</td>
-            
-            <td>
-              {% if walker.photo %}
-                <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="{{ walker.name }}" class="profile-photo">
-              {% else %}
-                <span>No photo</span>
-              {% endif %}
-            </td>
-
-            {% if not session.get('admin') %}
-            <td>
-              <a href="{{ url_for('book_walker', id=walker.id) }}" class="book-button">📅 Book</a>
-            </td>
-            {% endif %}
-
-            {% if session.get('admin') %}
-            <td>
-              <form method="POST" action="{{ url_for('remove_walker_by_id', id=walker.id) }}">
-                <button type="submit" class="remove-btn">Remove</button>
-              </form>
-            </td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
-</main>
+  <div class="card-container">
+    {% if walkers %}
+      {% for walker in walkers %}
+        <div class="walker-card">
+          <img src="{{ url_for('static', filename='uploads/' ~ walker.photo) }}" alt="Photo of {{ walker.name }}">
+          <h3>{{ walker.name }}</h3>
+          <p>{{ walker.experience }}</p>
+          <p><strong>City:</strong> {{ walker.city }}</p>
+          <p><strong>Availability:</strong> {{ walker.availability }}</p>
+          <p><strong>Dog size:</strong> {{ walker.dog_size }}</p>
+          <a href="{{ url_for('book_walker', id=walker.id) }}" class="cta-button" style="margin-top: 10px; display: inline-block;">Book {{ walker.name }}</a>
+          {% if session.admin %}
+        <form action="{{ url_for('remove_walker_by_id', id=walker.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this walker?');">
+            <button type="submit" class="remove-button">Remove</button>
+        </form>
+{% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p style="text-align: center; font-size: 1.2rem;">🐕 No walkers available right now. Be the first to register and show some tail-wagging energy!</p>
+    {% endif %}
+  </div>
 {% endblock %}
